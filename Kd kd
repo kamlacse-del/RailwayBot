@@ -1,0 +1,37 @@
+from telegram import Bot
+from apscheduler.schedulers.blocking import BlockingScheduler
+
+# --- CONFIGURATION ---
+BOT_TOKEN = "8467031225:AAFXX9UtcBBcIJu1B6hkHnIYOHDVvi0H9j0"
+CHAT_ID = "-1002904160957"  # your group chat ID
+REFERRAL_LINK = "https://mantrishop.in/#/pages/person/register?r_code=690184"
+BONUS_IMAGE_PATH = "bonus_image.jpg"  # place this image in same folder
+
+bot = Bot(token=BOT_TOKEN)
+scheduler = BlockingScheduler()
+
+# --- MESSAGE TO SEND ---
+def send_referral():
+    caption = (
+        "🎁 **Mantrishop Offer!** 🎁\n\n"
+        "Recharge **₹300 → Get ₹258 bonus** instantly! 🔥\n"
+        "Refer just **5 friends → Earn ₹1290+** 💸\n\n"
+        f"👉 **Join now:** [Click Here]({REFERRAL_LINK})\n\n"
+        "Don't miss out — start earning today! 🚀"
+    )
+    try:
+        with open(BONUS_IMAGE_PATH, "rb") as img:
+            bot.send_photo(chat_id=CHAT_ID, photo=img, caption=caption, parse_mode='Markdown')
+        print("Message sent successfully!")
+    except Exception as e:
+        print(f"Error sending message: {e}")
+
+# --- TIMES TO POST ---
+times = ["09:29", "11:29", "11:50", "13:29", "15:29", "16:29", "17:00", "18:00", "19:29", "20:40", "21:40"]
+
+for t in times:
+    hour, minute = map(int, t.split(":"))
+    scheduler.add_job(send_referral, 'cron', hour=hour, minute=minute)
+
+print("Bot is running... Press Ctrl+C to stop.")
+scheduler.start()
